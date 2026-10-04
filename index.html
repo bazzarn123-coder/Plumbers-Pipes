@@ -119,7 +119,7 @@
 
 
     <!-- ================= GAME UI HEADER ================= -->
-    <header id="game-header" class="flex items-center justify-between px-4 py-2.5 bg-slate-950/90 backdrop-blur-md border-b-2 border-yellow-400/80 shrink-0 z-10 transition-colors duration-500">
+    <header id="game-header" class="flex items-center justify-between px-4 py-2 bg-slate-950/90 backdrop-blur-md border-b-2 border-yellow-400/80 shrink-0 z-10 transition-colors duration-500">
         <div class="flex items-center gap-3">
             <button onclick="showSplashScreen()" class="p-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-extrabold border border-red-400 transition shadow" title="Main Menu">
                 🍄 MENU
@@ -131,19 +131,33 @@
         </div>
 
         <div class="flex items-center gap-2">
+            <!-- Custom Background Upload Button -->
+            <label class="px-2.5 py-1.5 bg-sky-900 hover:bg-sky-800 text-sky-200 text-xs font-bold rounded-lg transition border border-sky-700 cursor-pointer flex items-center gap-1" title="Upload Custom Background Image">
+                📷 <span>BG</span>
+                <input type="file" accept="image/*" onchange="uploadCustomBg(event)" class="hidden">
+            </label>
             <button id="sound-btn" onclick="toggleSound()" class="p-1.5 rounded-lg bg-sky-900 hover:bg-sky-800 text-slate-200 text-xs transition">🔊</button>
-            <button onclick="solveLevel()" class="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-400 text-slate-950 text-xs font-black rounded-lg shadow transition border border-yellow-300">Auto Solve</button>
-            <button onclick="resetLevel()" class="px-2.5 py-1.5 bg-sky-900 hover:bg-sky-800 text-sky-200 text-xs font-bold rounded-lg transition border border-sky-700">Reset</button>
-            <div class="h-4 w-px bg-sky-800 mx-0.5"></div>
-            <button onclick="prevLevel()" class="px-2.5 py-1.5 bg-sky-900 hover:bg-sky-800 text-sky-200 text-xs rounded-lg transition">&larr;</button>
-            <button onclick="nextLevel()" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold rounded-lg shadow transition border border-emerald-400">&rarr;</button>
+            
+            <!-- Stacked Control Cluster -->
+            <div class="flex flex-col gap-1 w-28">
+                <!-- Top Row: Reset and Auto -->
+                <div class="flex gap-1 w-full">
+                    <button onclick="resetLevel()" class="flex-1 py-1 bg-sky-900 hover:bg-sky-800 text-sky-200 text-xs font-bold rounded-lg transition border border-sky-700 text-center">Reset</button>
+                    <button onclick="solveLevel()" class="flex-1 py-1 bg-yellow-500 hover:bg-yellow-400 text-slate-950 text-xs font-black rounded-lg shadow transition border border-yellow-300 text-center">Auto</button>
+                </div>
+                <!-- Bottom Row: Previous Stage & Next Stage -->
+                <div class="flex gap-1 w-full">
+                    <button onclick="prevLevel()" class="flex-1 py-1 bg-sky-900 hover:bg-sky-800 text-sky-200 text-xs font-bold rounded-lg transition border border-sky-700 text-center">&larr;</button>
+                    <button onclick="nextLevel()" class="flex-1 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold rounded-lg shadow transition border border-emerald-400 text-center">&rarr;</button>
+                </div>
+            </div>
         </div>
     </header>
 
 
     <!-- ================= PLAY AREA ================= -->
-    <main id="game-main" class="flex-1 relative w-full h-full overflow-hidden flex items-center justify-center bg-slate-950 transition-all duration-500">
-        <canvas id="gameCanvas" class="w-full h-full object-contain cursor-pointer"></canvas>
+    <main id="game-main" class="flex-1 relative w-full h-full overflow-hidden flex items-center justify-center bg-slate-950 bg-cover bg-center transition-all duration-500">
+        <canvas id="gameCanvas" class="w-full h-full object-contain cursor-pointer relative z-10"></canvas>
         
         <!-- MARIO COURSE CLEAR VICTORY OVERLAY -->
         <div id="win-overlay" class="absolute inset-0 bg-sky-950/80 backdrop-blur-md flex flex-col items-center justify-center hidden z-30 transition-all duration-500">
@@ -182,7 +196,7 @@
                     <span>⭐</span> COURSE CLEAR! <span>⭐</span>
                 </span>
                 <h2 class="text-3xl font-black text-yellow-400 mb-2 tracking-tight mario-yellow-title">
-                    FANTASTIC FLOW!
+                    WARP PIPE REPAIRED!
                 </h2>
                 <p class="text-xs text-sky-100 mb-6 leading-relaxed max-w-[240px]">
                     Water successfully warped from source to goal with absolute zero leaks!
@@ -216,17 +230,29 @@
             const now = audioCtx.currentTime;
 
             if (type === 'twist') {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'square';
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
-                gain.gain.setValueAtTime(0.06, now);
-                gain.gain.linearRampToValueAtTime(0.001, now + 0.05);
-                osc.start(now);
-                osc.stop(now + 0.05);
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'sawtooth';
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.frequency.setValueAtTime(900, now);
+                osc1.frequency.exponentialRampToValueAtTime(150, now + 0.018);
+                gain1.gain.setValueAtTime(0.025, now);
+                gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.018);
+                osc1.start(now);
+                osc1.stop(now + 0.018);
+
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.type = 'triangle';
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.frequency.setValueAtTime(1400, now + 0.012);
+                osc2.frequency.exponentialRampToValueAtTime(250, now + 0.028);
+                gain2.gain.setValueAtTime(0.02, now + 0.012);
+                gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.028);
+                osc2.start(now + 0.012);
+                osc2.stop(now + 0.028);
             } else if (type === 'solve') {
                 const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
                 notes.forEach((freq, idx) => {
@@ -236,10 +262,10 @@
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
                     osc.frequency.setValueAtTime(freq, now + idx * 0.04);
-                    gain.gain.setValueAtTime(0.08, now + idx * 0.04);
-                    gain.gain.linearRampToValueAtTime(0.001, now + idx * 0.04 + 0.08);
+                    gain.gain.setValueAtTime(0.25, now + idx * 0.04);
+                    gain.gain.linearRampToValueAtTime(0.001, now + idx * 0.04 + 0.12);
                     osc.start(now + idx * 0.04);
-                    osc.stop(now + idx * 0.04 + 0.08);
+                    osc.stop(now + idx * 0.04 + 0.12);
                 });
             } else if (type === 'warp') {
                 for (let i = 0; i < 4; i++) {
@@ -254,7 +280,7 @@
                     osc.frequency.exponentialRampToValueAtTime(420, startTime + 0.1);
                     osc.frequency.exponentialRampToValueAtTime(240, startTime + 0.18);
                     
-                    gain.gain.setValueAtTime(0.12, startTime);
+                    gain.gain.setValueAtTime(0.80, startTime);
                     gain.gain.linearRampToValueAtTime(0.001, startTime + 0.19);
                     
                     osc.start(startTime);
@@ -265,8 +291,23 @@
     </script>
 
 
-    <!-- ================= GAME ENGINE & SAVE SYSTEM ================= -->
+    <!-- ================= GAME ENGINE & CUSTOM BG SYSTEM ================= -->
     <script>
+        let customBgImage = localStorage.getItem('mariosPipesGameplayBg') || 'your-image.jpg';
+
+        function uploadCustomBg(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    customBgImage = e.target.result;
+                    localStorage.setItem('mariosPipesGameplayBg', customBgImage);
+                    applyTheme(currentLevel);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
@@ -283,7 +324,7 @@
             { 
                 name: 'Overworld', 
                 body: '#16a34a', highlight: '#86efac', outline: '#14532d', inner: '#15803d',
-                bgGradient: 'radial-gradient(circle at center, rgba(34, 197, 94, 0.15) 0%, rgba(15, 23, 42, 1) 100%)',
+                bgGradient: 'radial-gradient(circle at center, rgba(34, 197, 94, 0.3) 0%, rgba(15, 23, 42, 0.85) 100%)',
                 bodyBg: '#0f172a',
                 headerBorder: '#facc15',
                 decorType: 'mushrooms'
@@ -291,7 +332,7 @@
             { 
                 name: 'Castle', 
                 body: '#dc2626', highlight: '#fca5a5', outline: '#7f1d1d', inner: '#991b1b',
-                bgGradient: 'radial-gradient(circle at center, rgba(220, 38, 38, 0.2) 0%, rgba(24, 8, 8, 1) 100%)',
+                bgGradient: 'radial-gradient(circle at center, rgba(220, 38, 38, 0.35) 0%, rgba(24, 8, 8, 0.85) 100%)',
                 bodyBg: '#180808',
                 headerBorder: '#ef4444',
                 decorType: 'embers'
@@ -299,7 +340,7 @@
             { 
                 name: 'Underground', 
                 body: '#d97706', highlight: '#fde68a', outline: '#78350f', inner: '#b45309',
-                bgGradient: 'radial-gradient(circle at center, rgba(217, 119, 6, 0.2) 0%, rgba(28, 20, 8, 1) 100%)',
+                bgGradient: 'radial-gradient(circle at center, rgba(217, 119, 6, 0.35) 0%, rgba(28, 20, 8, 0.85) 100%)',
                 bodyBg: '#1c1408',
                 headerBorder: '#f59e0b',
                 decorType: 'bricks'
@@ -307,7 +348,7 @@
             { 
                 name: 'Underworld', 
                 body: '#2563eb', highlight: '#93c5fd', outline: '#1e3a8a', inner: '#1d4ed8',
-                bgGradient: 'radial-gradient(circle at center, rgba(37, 99, 235, 0.2) 0%, rgba(8, 15, 28, 1) 100%)',
+                bgGradient: 'radial-gradient(circle at center, rgba(37, 99, 235, 0.35) 0%, rgba(8, 15, 28, 0.85) 100%)',
                 bodyBg: '#080f1c',
                 headerBorder: '#3b82f6',
                 decorType: 'bubbles'
@@ -525,9 +566,16 @@
 
         function applyTheme(levelIdx) {
             const activeTheme = pipeThemes[(levelIdx - 1) % pipeThemes.length];
+            const gameMain = document.getElementById('game-main');
+            
             document.getElementById('page-body').style.backgroundColor = activeTheme.bodyBg;
-            document.getElementById('game-main').style.background = activeTheme.bgGradient;
             document.getElementById('game-header').style.borderColor = activeTheme.headerBorder;
+
+            if (customBgImage) {
+                gameMain.style.backgroundImage = `${activeTheme.bgGradient}, url('${customBgImage}')`;
+            } else {
+                gameMain.style.backgroundImage = activeTheme.bgGradient;
+            }
         }
 
         function initLevel(idx) {
@@ -595,6 +643,8 @@
         }
 
         function drawBackgroundDecorations(w, h, theme) {
+            if (customBgImage) return;
+
             ctx.save();
             const decor = theme.decorType;
 
@@ -700,8 +750,8 @@
                     let isFlowing = activeFlowMap && activeFlowMap[r] && activeFlowMap[r][c];
                     let leaks = activeLeaks ? activeLeaks[r][c] : [];
 
-                    ctx.fillStyle = 'rgba(15, 23, 42, 0.4)';
-                    ctx.strokeStyle = isFlowing ? 'rgba(56, 189, 248, 0.4)' : 'rgba(30, 41, 59, 0.8)';
+                    ctx.fillStyle = customBgImage ? 'rgba(15, 23, 42, 0.45)' : 'rgba(15, 23, 42, 0.4)';
+                    ctx.strokeStyle = isFlowing ? 'rgba(56, 189, 248, 0.5)' : 'rgba(255, 255, 255, 0.15)';
                     ctx.lineWidth = 1.5;
                     ctx.fillRect(px + 1, py + 1, cellSize - 2, cellSize - 2);
                     ctx.strokeRect(px + 1, py + 1, cellSize - 2, cellSize - 2);
