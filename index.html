@@ -43,8 +43,8 @@
     <!-- ================= SPLASH SCREEN WITH BARIO.JPG ================= -->
     <div id="splash-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-between p-6 bg-cover bg-center transition-opacity duration-500" style="background-image: url('Bario.jpg');">
         
-        <!-- Dark gradient overlay for contrast -->
-        <div class="absolute inset-0 bg-slate-950/30 backdrop-blur-[1px] pointer-events-none"></div>
+        <!-- Dark tint overlay without blur for maximum image clarity -->
+        <div class="absolute inset-0 bg-slate-950/20 pointer-events-none"></div>
 
         <!-- Header decor -->
         <div class="relative z-10 w-full flex justify-between items-center max-w-md pt-2">
@@ -242,16 +242,14 @@
                     osc.stop(now + idx * 0.04 + 0.08);
                 });
             } else if (type === 'warp') {
-                // Slower, deeper Mario Pipe "Whoop... Whoop... Whoop... Whoop" Sound Effect (4 times) with distinct gaps
                 for (let i = 0; i < 4; i++) {
-                    const startTime = now + i * 0.28; // Noticeable delay/gap between each whoop
+                    const startTime = now + i * 0.28;
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.type = 'sine';
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
                     
-                    // Pitched deeper (lower starting/peak frequencies)
                     osc.frequency.setValueAtTime(180, startTime);
                     osc.frequency.exponentialRampToValueAtTime(420, startTime + 0.1);
                     osc.frequency.exponentialRampToValueAtTime(240, startTime + 0.18);
@@ -281,7 +279,6 @@
         let activeLeaks = null;
         let levelSolved = false;
 
-        // Pipe Themes with corresponding thematic background environments
         const pipeThemes = [
             { 
                 name: 'Overworld', 
@@ -996,7 +993,7 @@
 
             if (allConnected && !hasLeaks) {
                 levelSolved = true;
-                playSound('warp'); // Play 4 slower, deeper Mario Warp Whoop sounds!
+                playSound('warp');
                 
                 setTimeout(() => {
                     document.getElementById('win-overlay').classList.remove('hidden');
