@@ -157,7 +157,7 @@
 
     <!-- ================= PLAY AREA ================= -->
     <main id="game-main" class="flex-1 relative w-full h-full overflow-hidden flex items-center justify-center bg-slate-950 bg-cover bg-center transition-all duration-500">
-        <canvas id="gameCanvas" class="w-full h-full object-contain cursor-pointer relative z-10"></canvas>
+        <canvas id="gameCanvas" class="absolute inset-0 w-full h-full cursor-pointer z-10"></canvas>
         
         <!-- MARIO COURSE CLEAR VICTORY OVERLAY -->
         <div id="win-overlay" class="absolute inset-0 bg-sky-950/80 backdrop-blur-md flex flex-col items-center justify-center hidden z-30 transition-all duration-500">
@@ -730,11 +730,16 @@
             const rows = l.grid.length;
             const cols = l.grid[0].length;
             
+            // Allow more padding horizontal space for IN and OUT pipes so grid fits seamlessly across screens
+            const paddingX = 100;
+            const paddingY = 40;
+
             const cellSize = Math.min(
-                Math.floor((w - 90) / (cols + 0.8)), 
-                Math.floor((h - 50) / rows)
+                Math.floor((w - paddingX) / cols), 
+                Math.floor((h - paddingY) / rows)
             );
-            const startX = (w - cols * cellSize) / 2 + 10;
+
+            const startX = (w - cols * cellSize) / 2;
             const startY = (h - rows * cellSize) / 2;
 
             l.renderOffsetX = startX;
@@ -844,8 +849,8 @@
             ctx.fillRect(x - 12, y - pWidth / 2, 12, pWidth);
             ctx.strokeRect(x - 12, y - pWidth / 2, 12, pWidth);
 
-            const rimW = 28;
-            const rimH = Math.max(28, Math.floor(cs * 0.62));
+            const rimW = Math.max(20, Math.floor(cs * 0.35));
+            const rimH = Math.max(24, Math.floor(cs * 0.62));
             const rimX = x - 12 - rimW;
             const rimY = y - rimH / 2;
 
@@ -880,8 +885,8 @@
             ctx.fillRect(x, y - pWidth / 2, 12, pWidth);
             ctx.strokeRect(x, y - pWidth / 2, 12, pWidth);
 
-            const rimW = 28;
-            const rimH = Math.max(28, Math.floor(cs * 0.62));
+            const rimW = Math.max(20, Math.floor(cs * 0.35));
+            const rimH = Math.max(24, Math.floor(cs * 0.62));
             const rimX = x + 12;
             const rimY = y - rimH / 2;
 
